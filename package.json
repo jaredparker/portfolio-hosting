@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-hosting",
+  "version": "1.0.0",
+  "description": "Portfolio microservice to handle automatic launching and serving of projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jared Parker",
+  "license": "AGPL-3.0-or-later"
+}
