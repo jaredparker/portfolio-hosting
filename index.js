@@ -7,7 +7,7 @@ const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
 const subdomain    = require('express-subdomain');
 
-// const db = require('portfolio-db');
+const db = require('portfolio-db');
 const ProjectManager = require( path.join( __dirname, './lib/project-manager.js' ) );
 
 if( process.env.NODE_ENV != 'production' ){ require('dotenv').config(); }
@@ -18,13 +18,13 @@ fs.remove( path.join( __dirname, 'projects', 'temp' ) );
 
 // DataBase init
 
-// const uri = process.env.MONGO_DB_URI;
-// const options = {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// };
+const uri = process.env.MONGO_DB_URI;
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+};
 
-// db.connect( uri, options );
+db.connect( uri, options );
 
 // App init
 
@@ -35,9 +35,25 @@ const server = http.createServer(app);
 
 const manager = new ProjectManager();
 
-setTimeout( () => {
-    manager.setLoaded();
-}, 10000 );
+// Load projects
+db.models.Project.find({}).then( projects => {
+
+    console.log( `Loaded ${projects.length} project(s)` );
+    console.log( projects.map( doc => `${doc.id} (${doc.details.name})` ) );
+
+    // Add projects to manager
+    manager.addProjects( projects, false );
+
+    setTimeout( () => {
+        manager.setLoaded( true );
+    }, 5000);
+});
+
+// Keep projects up to date
+db.models.Project.watch().on( 'change', change => {
+
+    // TODO
+});
 
 // Routes
 
