@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const subdomain    = require('express-subdomain');
 
 const db = require('portfolio-db');
+const logger = require('./lib/logger.js');
 const ProjectManager = require( path.join( __dirname, './lib/project-manager.js' ) );
 
 if( process.env.NODE_ENV != 'production' ){ require('dotenv').config(); }
@@ -38,15 +39,14 @@ const manager = new ProjectManager();
 // Load projects
 db.models.Project.find({}).then( projects => {
 
-    console.log( `Loaded ${projects.length} project(s)` );
-    console.log( projects.map( doc => `${doc.id} (${doc.details.name})` ) );
+    logger.info( `Found ${projects.length} project(s): ${projects.map( doc => `${doc.id} (${doc.details.name})` ).join(', ')}` );
 
     // Add projects to manager
-    manager.addProjects( projects, false );
+    manager.addProjects( projects );
 
     setTimeout( () => {
-        manager.setLoaded( true );
-    }, 5000);
+        manager.setLoaded( false );
+    }, 10000 );
 });
 
 // Keep projects up to date
@@ -55,15 +55,27 @@ db.models.Project.watch().on( 'change', change => {
     // TODO
 });
 
-// Routes
+// Middleware
 
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Logs
+
+app.use(( req, res, next ) => {
+    logger.log( 'request', `${req.protocol}://${req.get('host')}${req.url}` );
+    next();
+});
+server.on( 'upgrade', ( req, socket, head ) => {
+    logger.log( 'request', `${ socket.encrypted ? 'wss' : 'ws' }://${req.headers.host}${req.url}` );
+});
+
+// Routes
 
 server.on( 'upgrade', manager.upgradeMiddleware() );
 app.use(subdomain( `*`, manager.projectMiddleware() ));
 
 // listen for requests
 server.listen( process.env.PORT || 3000, () => {
-    console.log( `Listening at ${server.address().address}:${server.address().port}` );
+    logger.info( `Listening at ${server.address().address}:${server.address().port}` );
 });
