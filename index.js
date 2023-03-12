@@ -42,11 +42,12 @@ db.models.Project.find({}).then( projects => {
     logger.info( `Found ${projects.length} project(s): ${projects.map( doc => `${doc.id} (${doc.details.name})` ).join(', ')}` );
 
     // Add projects to manager
-    manager.addProjects( projects );
+    manager.addProjects( projects.map( project => {
+        const config = {...project.hosting}
+        config.id = project.id;
 
-    setTimeout( () => {
-        manager.setLoaded( false );
-    }, 10000 );
+        return config;
+    }));
 });
 
 // Keep projects up to date
