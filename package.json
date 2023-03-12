@@ -4,8 +4,22 @@
   "description": "Portfolio microservice to handle automatic launching and serving of projects",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "Jared Parker",
-  "license": "AGPL-3.0-or-later"
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-subdomain": "^1.0.5",
+    "fs-extra": "^11.1.0",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.21"
+  }
 }
