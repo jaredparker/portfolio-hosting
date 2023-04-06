@@ -1,17 +1,21 @@
 
-const path         = require('path');
-const fs           = require('fs-extra');
-const http         = require('http');
-const express      = require('express');
-const bodyParser   = require('body-parser');
-const cookieParser = require('cookie-parser');
-const subdomain    = require('express-subdomain');
+import path from 'path';
+import fs from 'fs-extra';
+import http from 'http';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import subdomain from 'express-subdomain';
+import * as dotenv from 'dotenv';
 
-const db = require('portfolio-db');
-const logger = require('./lib/logger.js');
-const ProjectManager = require( path.join( __dirname, './lib/project-manager.js' ) );
+import db from 'portfolio-db';
+import logger from './lib/logger.js';
+import ProjectManager from './lib/project-manager.js';
+import { getDirname } from './lib/utils.js';
 
-if( process.env.NODE_ENV != 'production' ){ require('dotenv').config(); }
+const __dirname = getDirname( import.meta.url );
+
+if( process.env.NODE_ENV != 'production' ){ dotenv.config(); }
 
 // Clear workspace
 
