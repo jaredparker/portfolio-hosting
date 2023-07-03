@@ -12,6 +12,7 @@ import db from 'portfolio-db';
 import logger from './lib/logger.js';
 import ProjectManager from './lib/project-manager.js';
 import { getDirname } from './lib/utils.js';
+import { catchErrors, errorMiddleware } from './lib/errors.js';
 
 const __dirname = getDirname( import.meta.url );
 
@@ -77,8 +78,11 @@ server.on( 'upgrade', ( req, socket, head ) => {
 
 // Routes
 
-server.on( 'upgrade', manager.upgradeMiddleware() );
-app.use(subdomain( `*`, manager.projectMiddleware() ));
+server.on( 'upgrade', catchErrors( manager.upgradeMiddleware() ) );
+app.use( subdomain( `*`, catchErrors( manager.projectMiddleware() ) ) );
+
+// Error handling
+app.use( errorMiddleware );
 
 // listen for requests
 server.listen( process.env.PORT || 3000, () => {

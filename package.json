@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon --ignore ./projects/ index.js"
   },
   "author": "Jared Parker",
   "license": "AGPL-3.0-or-later",
@@ -14,12 +14,19 @@
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
     "express-subdomain": "^1.0.5",
     "fs-extra": "^11.1.0",
+    "get-port": "^6.1.2",
     "http": "^0.0.1-security",
+    "http-proxy-middleware": "^2.0.6",
     "path": "^0.12.7",
+    "queue": "^6.0.2",
+    "tree-kill": "^1.2.2",
+    "wait-port": "^1.0.4",
     "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
