@@ -11,12 +11,13 @@ import * as dotenv from 'dotenv';
 import db from 'portfolio-db';
 import logger from './lib/logger.js';
 import ProjectManager from './lib/project-manager.js';
-import { getDirname } from './lib/utils.js';
+import { getDirname, subdomainUpgrade } from './lib/utils.js';
 import { catchErrors, errorMiddleware } from './lib/errors.js';
 
 const __dirname = getDirname( import.meta.url );
 
 if( process.env.NODE_ENV != 'production' ){ dotenv.config(); }
+const subdomainOffset = 2 + ( process.env.TOP_LEVEL_DOMAIN?.split('.')?.length-1 || 0 ) // Multi-level TLDs
 
 // Clear workspace
 
@@ -63,8 +64,10 @@ db.models.Project.watch().on( 'change', change => {
 
 // Middleware
 
-app.use(bodyParser.json());
-app.use(cookieParser());
+app.use( bodyParser.json() );
+app.use( cookieParser() );
+app.set( 'subdomain offset', subdomainOffset )
+server.on( 'upgrade', req => req.subdomains = req.headers.host.split('.').reverse().slice( subdomainOffset ) );
 
 // Logs
 
@@ -78,8 +81,11 @@ server.on( 'upgrade', ( req, socket, head ) => {
 
 // Routes
 
-server.on( 'upgrade', catchErrors( manager.upgradeMiddleware() ) );
-app.use( subdomain( `*`, catchErrors( manager.projectMiddleware() ) ) );
+const subdomainRoute = process.env.SUBDOMAIN ? `*.${process.env.SUBDOMAIN}` : '*';
+const subdomainLevel = process.env.SUBDOMAIN?.split('.')?.length || 0;
+
+server.on( 'upgrade', subdomainUpgrade( subdomainRoute, catchErrors( manager.upgradeMiddleware({ subdomainLevel }) ) ) );
+app.use( subdomain( subdomainRoute, catchErrors( manager.projectMiddleware({ subdomainLevel }) ) ) );
 
 // Error handling
 app.use( errorMiddleware );
