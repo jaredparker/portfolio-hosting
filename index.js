@@ -82,7 +82,7 @@ server.on( 'upgrade', ( req, socket, head ) => {
 // Routes
 
 const subdomainRoute = process.env.SUBDOMAIN ? `*.${process.env.SUBDOMAIN}` : '*';
-const subdomainLevel = process.env.SUBDOMAIN?.split('.')?.length || 0;
+const subdomainLevel = process.env.SUBDOMAIN ? process.env.split('.').length : 0;
 
 server.on( 'upgrade', subdomainUpgrade( subdomainRoute, catchErrors( manager.upgradeMiddleware({ subdomainLevel }) ) ) );
 app.use( subdomain( subdomainRoute, catchErrors( manager.projectMiddleware({ subdomainLevel }) ) ) );
